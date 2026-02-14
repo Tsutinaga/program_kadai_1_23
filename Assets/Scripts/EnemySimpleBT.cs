@@ -13,7 +13,7 @@ public class EnemySimpleBT : MonoBehaviour
 
     private float speed;
     private Transform player;
-    private Vector3 lastDirection;
+    private Vector3 moveDirection; // 開始時に1回だけ計算した方向
 
     void Start()
     {
@@ -21,7 +21,68 @@ public class EnemySimpleBT : MonoBehaviour
 
         PlayerController playerCtrl = FindFirstObjectByType<PlayerController>();
         if (playerCtrl != null)
+        {
             player = playerCtrl.transform;
+            CalculateInterceptDirection();
+        }
+    }
+
+    // 二次方程式で正確なインターセプト方向を1回だけ計算
+    void CalculateInterceptDirection()
+    {
+        Vector3 enemyPos = transform.position;
+        Vector3 playerPos = player.position;
+
+        float dx = playerPos.x - enemyPos.x;
+        float dy = playerPos.y - enemyPos.y;
+        float vs = playerSpeed; // プレイヤー速度（右方向のみ）
+
+        // 解く方程式:  |enemyPos + d * t - (playerPos + (vs*t, 0))|² = 0
+        // → (dx + vs*t)² + dy² = (speed*t)²
+        // → (vs² - speed²)t² + 2*dx*vs*t + (dx² + dy²) = 0
+        float a = vs * vs - speed * speed;
+        float b = 2f * dx * vs;
+        float c = dx * dx + dy * dy;
+
+        float interceptTime = -1f;
+
+        if (Mathf.Abs(a) < 0.001f)
+        {
+            // a≒0（速度が同じ）: 線形方程式
+            if (Mathf.Abs(b) > 0.001f)
+                interceptTime = -c / b;
+        }
+        else
+        {
+            float disc = b * b - 4f * a * c;
+            if (disc >= 0f)
+            {
+                float t1 = (-b + Mathf.Sqrt(disc)) / (2f * a);
+                float t2 = (-b - Mathf.Sqrt(disc)) / (2f * a);
+
+                // 正の解のうち小さい方を採用
+                if (t1 > 0f && t2 > 0f)
+                    interceptTime = Mathf.Min(t1, t2);
+                else if (t1 > 0f)
+                    interceptTime = t1;
+                else if (t2 > 0f)
+                    interceptTime = t2;
+            }
+        }
+
+        Vector3 targetPos;
+        if (interceptTime > 0f)
+        {
+            // 正確なインターセプト位置
+            targetPos = playerPos + Vector3.right * vs * interceptTime;
+        }
+        else
+        {
+            // 解なし（追いつけない）→ 現在位置を直接狙う
+            targetPos = playerPos;
+        }
+
+        moveDirection = (targetPos - enemyPos).normalized;
     }
 
     void Update()
@@ -42,30 +103,22 @@ public class EnemySimpleBT : MonoBehaviour
         if (player == null) return;
 
         float distance = Vector3.Distance(transform.position, player.position);
-
-        // 一定距離以内に入ったらすり抜けモードに切り替え
         if (distance <= passThroughDistance)
         {
             currentState = State.PassingThrough;
             return;
         }
 
-        // 先読み：自分が届くまでの時間にプレイヤーが進む位置を計算
-        float timeToReach = distance / speed;
-        Vector3 predictedPos = player.position + Vector3.right * playerSpeed * timeToReach;
-
-        // 予測位置に向かって移動（方向を記録しておく）
-        lastDirection = (predictedPos - transform.position).normalized;
-        transform.position += lastDirection * speed * Time.deltaTime;
+        // 計算済みの方向に直進（毎フレーム再計算しない）
+        transform.position += moveDirection * speed * Time.deltaTime;
     }
 
     void PassThrough()
     {
-        // 最後の方向にそのまま直進してすり抜ける
-        transform.position += lastDirection * speed * Time.deltaTime;
+        // 同じ方向でそのまま直進してすり抜ける
+        transform.position += moveDirection * speed * Time.deltaTime;
 
-        // 画面外に出たら削除
-        if (Vector3.Distance(transform.position, player.position) > 30f)
+        if (player != null && Vector3.Distance(transform.position, player.position) > 30f)
             Destroy(gameObject);
     }
 
