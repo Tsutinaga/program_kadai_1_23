@@ -35,9 +35,9 @@ public class TitleManager : MonoBehaviour
         CreateLabel(canvasObj.transform, "- Select Stage -", new Vector2(0, 170), 36, new Color(0.8f, 0.8f, 0.8f));
 
         // ステージボタン
-        CreateStageButton(canvasObj.transform, "STAGE  1", new Color(0.15f, 0.45f, 0.8f), new Vector2(0, 50), 1);
-        CreateStageButton(canvasObj.transform, "STAGE  2", new Color(0.15f, 0.6f, 0.3f), new Vector2(0, -80), 2);
-        CreateStageButton(canvasObj.transform, "STAGE  3", new Color(0.75f, 0.25f, 0.15f), new Vector2(0, -210), 3);
+        CreateStageButton(canvasObj.transform, "STAGE  1", new Color(0.15f, 0.45f, 0.8f), new Vector2(0, 50), "Stage1");
+        CreateStageButton(canvasObj.transform, "STAGE  2", new Color(0.15f, 0.6f, 0.3f), new Vector2(0, -80), "Stage2");
+        CreateStageButton(canvasObj.transform, "STAGE  3", new Color(0.75f, 0.25f, 0.15f), new Vector2(0, -210), "Stage3");
     }
 
     void CreatePanel(Transform parent, Color color)
@@ -70,7 +70,7 @@ public class TitleManager : MonoBehaviour
         tmp.raycastTarget = false;
     }
 
-    void CreateStageButton(Transform parent, string label, Color btnColor, Vector2 pos, int stage)
+    void CreateStageButton(Transform parent, string label, Color btnColor, Vector2 pos, string sceneName)
     {
         GameObject btnObj = new GameObject(label);
         btnObj.transform.SetParent(parent, false);
@@ -86,8 +86,8 @@ public class TitleManager : MonoBehaviour
         cb.highlightedColor = btnColor * 1.3f;
         cb.pressedColor = btnColor * 0.7f;
         btn.colors = cb;
-        int s = stage;
-        btn.onClick.AddListener(() => StartStage(s));
+        string sn = sceneName;
+        btn.onClick.AddListener(() => StartStage(sn));
 
         // ボタンラベル
         GameObject textObj = new GameObject("Text");
@@ -104,9 +104,12 @@ public class TitleManager : MonoBehaviour
         tmp.fontStyle = FontStyles.Bold;
     }
 
-    void StartStage(int stage)
+    void StartStage(string sceneName)
     {
-        StageManager.CurrentStage = stage;
-        SceneManager.LoadScene("SampleScene");
+        // ステージ番号をシーン名から取得してセット
+        if (sceneName == "Stage1") StageManager.CurrentStage = 1;
+        else if (sceneName == "Stage2") StageManager.CurrentStage = 2;
+        else if (sceneName == "Stage3") StageManager.CurrentStage = 3;
+        SceneManager.LoadScene(sceneName);
     }
 }

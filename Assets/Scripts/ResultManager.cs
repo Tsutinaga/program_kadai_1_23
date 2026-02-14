@@ -69,7 +69,7 @@ public class ResultManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         StageManager.CurrentStage++;
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("Stage" + StageManager.CurrentStage);
     }
 
     void GoToTitle()
