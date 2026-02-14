@@ -8,10 +8,13 @@ public class TitleManager : MonoBehaviour
 {
     void Start()
     {
-        // EventSystem
-        GameObject esObj = new GameObject("EventSystem");
-        esObj.AddComponent<EventSystem>();
-        esObj.AddComponent<StandaloneInputModule>();
+        // EventSystem（既存がなければ作成）
+        if (FindObjectOfType<EventSystem>() == null)
+        {
+            GameObject esObj = new GameObject("EventSystem");
+            esObj.AddComponent<EventSystem>();
+            esObj.AddComponent<StandaloneInputModule>();
+        }
 
         // Canvas
         GameObject canvasObj = new GameObject("Canvas");
@@ -43,6 +46,7 @@ public class TitleManager : MonoBehaviour
         obj.transform.SetParent(parent, false);
         Image img = obj.AddComponent<Image>();
         img.color = color;
+        img.raycastTarget = false;
         RectTransform rt = img.rectTransform;
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
@@ -63,6 +67,7 @@ public class TitleManager : MonoBehaviour
         tmp.fontSize = size;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.color = color;
+        tmp.raycastTarget = false;
     }
 
     void CreateStageButton(Transform parent, string label, Color btnColor, Vector2 pos, int stage)
