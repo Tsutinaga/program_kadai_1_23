@@ -9,6 +9,7 @@ public class EnemySimpleBT : MonoBehaviour
     [SerializeField] private float minSpeed = 1f;
     [SerializeField] private float maxSpeed = 4f;
     [SerializeField] private float passThroughDistance = 1f; // この距離以内に入ったらすり抜けに切り替え
+    [SerializeField] private float playerSpeed = 2f;         // PlayerControllerのmoveSpeedと合わせる
 
     private float speed;
     private Transform player;
@@ -49,8 +50,12 @@ public class EnemySimpleBT : MonoBehaviour
             return;
         }
 
-        // プレイヤーに向かって移動（方向を記録しておく）
-        lastDirection = (player.position - transform.position).normalized;
+        // 先読み：自分が届くまでの時間にプレイヤーが進む位置を計算
+        float timeToReach = distance / speed;
+        Vector3 predictedPos = player.position + Vector3.right * playerSpeed * timeToReach;
+
+        // 予測位置に向かって移動（方向を記録しておく）
+        lastDirection = (predictedPos - transform.position).normalized;
         transform.position += lastDirection * speed * Time.deltaTime;
     }
 
