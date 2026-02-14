@@ -7,7 +7,9 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private int enemyCount = 20;
     [SerializeField] private float minX = 5f;
     [SerializeField] private float maxX = 45f;
-    [SerializeField] private float minDistance = 3f; // “G“¯m‚ÌÅ¬ŠÔŠu
+    [SerializeField] private float minY = -4f;
+    [SerializeField] private float maxY = 4f;
+    [SerializeField] private float minDistance = 3f; // æ•µåŒå£«ã®æœ€å°é–“éš”
 
     private List<Vector3> spawnedPositions = new List<Vector3>();
 
@@ -33,9 +35,10 @@ public class EnemySpawner : MonoBehaviour
         for (int attempt = 0; attempt < maxAttempts; attempt++)
         {
             float randomX = Random.Range(minX, maxX);
-            Vector3 candidate = new Vector3(randomX, 0, 0);
+            float randomY = Random.Range(minY, maxY);
+            Vector3 candidate = new Vector3(randomX, randomY, 0);
 
-            // ‘¼‚Ì“G‚Æ‹——£ƒ`ƒFƒbƒN
+            // æ—¢å­˜ã®æ•µã¨è·é›¢ãƒã‚§ãƒƒã‚¯
             bool isFarEnough = true;
             foreach (Vector3 pos in spawnedPositions)
             {
@@ -52,7 +55,7 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
-        // Œ©‚Â‚©‚ç‚È‚¯‚ê‚Îƒ‰ƒ“ƒ_ƒ€‚Å‘Ã‹¦
-        return new Vector3(Random.Range(minX, maxX), 0, 0);
+        // è¦‹ã¤ã‹ã‚‰ãªã‘ã‚Œã°ãƒ©ãƒ³ãƒ€ãƒ ã§å¼·åˆ¶é…ç½®
+        return new Vector3(Random.Range(minX, maxX), Random.Range(minY, maxY), 0);
     }
 }

@@ -1,23 +1,73 @@
 using UnityEngine;
 
-// Behavior Tree ƒpƒ^[ƒ“‚ğg—p‚µ‚½“GAI
+// Behavior Tree ãƒ‘ã‚¿ãƒ¼ãƒ³ã‚’ä½¿ç”¨ã—ãŸæ•µAI
 public class EnemySimpleBT : MonoBehaviour
 {
-    private enum State { Idle, Destroyed }
+    private enum State { Idle, Chasing, Attacking, Destroyed }
     private State currentState = State.Idle;
+
+    [SerializeField] private float minSpeed = 1f;
+    [SerializeField] private float maxSpeed = 4f;
+    [SerializeField] private float attackDistance = 0.5f;
+
+    private float speed;
+    private Transform player;
+    private bool hasAttacked = false;
+
+    void Start()
+    {
+        // ãƒ©ãƒ³ãƒ€ãƒ ãªé€Ÿåº¦ã‚’è¨­å®š
+        speed = Random.Range(minSpeed, maxSpeed);
+
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¢ã™
+        PlayerController playerCtrl = FindFirstObjectByType<PlayerController>();
+        if (playerCtrl != null)
+            player = playerCtrl.transform;
+
+        currentState = State.Chasing;
+    }
 
     void Update()
     {
-        // Behavior Tree: ƒVƒ“ƒvƒ‹‚Èó‘Ô‘JˆÚ
         switch (currentState)
         {
-            case State.Idle:
-                // ƒAƒCƒhƒ‹ó‘Ô: ‰½‚à‚µ‚È‚¢
+            case State.Chasing:
+                Chase();
                 break;
-            case State.Destroyed:
-                // ”j‰ó‚³‚ê‚½ó‘Ô
+            case State.Attacking:
+                // æ”»æ’ƒå¾Œã¯å‹•ã‹ãªã„
                 break;
         }
+    }
+
+    void Chase()
+    {
+        if (player == null) return;
+
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ç¾åœ¨ä½ç½®ã«å‘ã‹ã£ã¦ç§»å‹•
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            player.position,
+            speed * Time.deltaTime
+        );
+
+        // ååˆ†è¿‘ã¥ã„ãŸã‚‰æ”»æ’ƒ
+        float distance = Vector3.Distance(transform.position, player.position);
+        if (distance <= attackDistance)
+        {
+            Attack();
+        }
+    }
+
+    void Attack()
+    {
+        if (hasAttacked) return;
+        hasAttacked = true;
+        currentState = State.Attacking;
+
+        PlayerController playerCtrl = player.GetComponent<PlayerController>();
+        if (playerCtrl != null)
+            playerCtrl.TakeDamage();
     }
 
     public void OnDestroyed()

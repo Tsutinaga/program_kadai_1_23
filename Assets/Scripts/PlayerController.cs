@@ -4,22 +4,25 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 2f;
     [SerializeField] private float attackRange = 1.5f;
+    [SerializeField] private int maxHp = 3;
 
+    private int hp;
     private GameManager gameManager;
     private HitEffect hitEffect;
 
     void Start()
     {
+        hp = maxHp;
         gameManager = FindFirstObjectByType<GameManager>();
         hitEffect = FindFirstObjectByType<HitEffect>();
     }
 
     void Update()
     {
-        // ©“®‘Oi
+        // å³ã«å‰é€²
         transform.position += Vector3.right * moveSpeed * Time.deltaTime;
 
-        // ƒXƒy[ƒXƒL[‚ÅUŒ‚
+        // ã‚¹ãƒšãƒ¼ã‚¹ã‚­ãƒ¼ã§æ”»æ’ƒ
         if (Input.GetKeyDown(KeyCode.Space))
         {
             TryAttack();
@@ -28,7 +31,7 @@ public class PlayerController : MonoBehaviour
 
     void TryAttack()
     {
-        // –Ú‚Ì‘O‚Ì“G‚ğ’T‚·
+        // è¿‘ãã®æ•µã‚’æ¢ã™
         Enemy[] enemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
 
         foreach (Enemy enemy in enemies)
@@ -37,14 +40,21 @@ public class PlayerController : MonoBehaviour
 
             if (distance <= attackRange)
             {
-                // Timeline‰‰oÄ¶(“G‚ÌˆÊ’u‚ğ“n‚·)
+                // Timelineå†ç”Ÿ(æ•µã®ä½ç½®ã‚’æ¸¡ã™)
                 hitEffect.PlayHitEffect(enemy.transform.position);
 
-                // “G‚ğ“|‚µ‚ÄƒXƒRƒA‰ÁZ
+                // æ•µã‚’å€’ã—ã¦ã‚¹ã‚³ã‚¢åŠ ç®—
                 enemy.Die();
                 gameManager.AddScore(100);
-                break; // 1‘Ì‚¾‚¯“|‚·
+                break; // 1ä½“ã ã‘å€’ã™
             }
         }
+    }
+
+    public void TakeDamage()
+    {
+        hp--;
+        if (hp <= 0)
+            gameManager.GameOver();
     }
 }

@@ -23,7 +23,13 @@ public class GameManager : MonoBehaviour
 
     public void ReachGoal()
     {
-        // �S�[�����B�Ń��U���g�\��
+        // ゴール到達でリザルト表示
+        resultManager.ShowResult(score);
+    }
+
+    public void GameOver()
+    {
+        // ゲームオーバー：リザルト画面を流用してゲームを止める
         resultManager.ShowResult(score);
     }
 
