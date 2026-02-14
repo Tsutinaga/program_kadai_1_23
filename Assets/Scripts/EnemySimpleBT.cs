@@ -3,28 +3,24 @@ using UnityEngine;
 // Behavior Tree パターンを使用した敵AI
 public class EnemySimpleBT : MonoBehaviour
 {
-    private enum State { Idle, Chasing, Attacking, Destroyed }
-    private State currentState = State.Idle;
+    private enum State { Chasing, PassingThrough, Destroyed }
+    private State currentState = State.Chasing;
 
     [SerializeField] private float minSpeed = 1f;
     [SerializeField] private float maxSpeed = 4f;
-    [SerializeField] private float attackDistance = 0.5f;
+    [SerializeField] private float passThroughDistance = 1f; // この距離以内に入ったらすり抜けに切り替え
 
     private float speed;
     private Transform player;
-    private bool hasAttacked = false;
+    private Vector3 lastDirection;
 
     void Start()
     {
-        // ランダムな速度を設定
         speed = Random.Range(minSpeed, maxSpeed);
 
-        // プレイヤーを探す
         PlayerController playerCtrl = FindFirstObjectByType<PlayerController>();
         if (playerCtrl != null)
             player = playerCtrl.transform;
-
-        currentState = State.Chasing;
     }
 
     void Update()
@@ -34,8 +30,8 @@ public class EnemySimpleBT : MonoBehaviour
             case State.Chasing:
                 Chase();
                 break;
-            case State.Attacking:
-                // 攻撃後は動かない
+            case State.PassingThrough:
+                PassThrough();
                 break;
         }
     }
@@ -44,30 +40,28 @@ public class EnemySimpleBT : MonoBehaviour
     {
         if (player == null) return;
 
-        // プレイヤーの現在位置に向かって移動
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            player.position,
-            speed * Time.deltaTime
-        );
-
-        // 十分近づいたら攻撃
         float distance = Vector3.Distance(transform.position, player.position);
-        if (distance <= attackDistance)
+
+        // 一定距離以内に入ったらすり抜けモードに切り替え
+        if (distance <= passThroughDistance)
         {
-            Attack();
+            currentState = State.PassingThrough;
+            return;
         }
+
+        // プレイヤーに向かって移動（方向を記録しておく）
+        lastDirection = (player.position - transform.position).normalized;
+        transform.position += lastDirection * speed * Time.deltaTime;
     }
 
-    void Attack()
+    void PassThrough()
     {
-        if (hasAttacked) return;
-        hasAttacked = true;
-        currentState = State.Attacking;
+        // 最後の方向にそのまま直進してすり抜ける
+        transform.position += lastDirection * speed * Time.deltaTime;
 
-        PlayerController playerCtrl = player.GetComponent<PlayerController>();
-        if (playerCtrl != null)
-            playerCtrl.TakeDamage();
+        // 画面外に出たら削除
+        if (Vector3.Distance(transform.position, player.position) > 30f)
+            Destroy(gameObject);
     }
 
     public void OnDestroyed()
