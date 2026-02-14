@@ -13,7 +13,14 @@ public class TitleManager : MonoBehaviour
         {
             GameObject esObj = new GameObject("EventSystem");
             esObj.AddComponent<EventSystem>();
-            esObj.AddComponent<StandaloneInputModule>();
+
+            // New Input System が有効な場合は InputSystemUIInputModule を使う
+            var newInputModule = System.Type.GetType(
+                "UnityEngine.InputSystem.UI.InputSystemUIInputModule, Unity.InputSystem");
+            if (newInputModule != null)
+                esObj.AddComponent(newInputModule);
+            else
+                esObj.AddComponent<StandaloneInputModule>();
         }
 
         // Canvas
@@ -106,7 +113,7 @@ public class TitleManager : MonoBehaviour
 
     void StartStage(string sceneName)
     {
-        // ステージ番号をシーン名から取得してセット
+        Debug.Log("[TitleManager] StartStage called: " + sceneName);
         if (sceneName == "Stage1") StageManager.CurrentStage = 1;
         else if (sceneName == "Stage2") StageManager.CurrentStage = 2;
         else if (sceneName == "Stage3") StageManager.CurrentStage = 3;
