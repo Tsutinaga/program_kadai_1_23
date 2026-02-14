@@ -15,10 +15,11 @@ public class Enemy : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        // ”’‚­ƒtƒ‰ƒbƒVƒ…‚³‚¹‚é
-        spriteRenderer.color = Color.white;
+        // EnemySimpleBT ã«æ­»äº¡ã‚’é€šçŸ¥
+        GetComponent<EnemySimpleBT>()?.OnDestroyed();
 
-        // 0.1•bŒã‚ÉÁ‚·
+        // ç™½ãƒ•ãƒ©ãƒƒã‚·ãƒ¥ã—ã¦ã‹ã‚‰å‰Šé™¤
+        spriteRenderer.color = Color.white;
         Destroy(gameObject, 0.1f);
     }
 }

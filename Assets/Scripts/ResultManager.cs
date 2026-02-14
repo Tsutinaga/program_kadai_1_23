@@ -7,16 +7,16 @@ public class ResultManager : MonoBehaviour
     [SerializeField] private GameObject resultPanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
 
-    public void ShowResult(int score)
+    public void ShowResult(int score, string title)
     {
         resultPanel.SetActive(true);
-        finalScoreText.text = "Final Score: " + score;
-        Time.timeScale = 0f; // ÉQÅ[ÉÄí‚é~
+        finalScoreText.text = title + "\nFinal Score: " + score;
+        Time.timeScale = 0f; // „Ç≤„Éº„É†ÂÅúÊ≠¢
     }
 
     public void RestartGame()
     {
-        Time.timeScale = 1f; // ÉQÅ[ÉÄçƒäJ
+        Time.timeScale = 1f; // „Ç≤„Éº„É†ÂÜçÈñã
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

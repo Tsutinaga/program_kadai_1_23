@@ -4,6 +4,7 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI hpText;
     private int score = 0;
     private int enemiesKilled = 0;
     private ResultManager resultManager;
@@ -21,16 +22,19 @@ public class GameManager : MonoBehaviour
         UpdateScoreUI();
     }
 
+    public void UpdateHpUI(int hp, int maxHp)
+    {
+        hpText.text = "HP: " + hp + " / " + maxHp;
+    }
+
     public void ReachGoal()
     {
-        // ゴール到達でリザルト表示
-        resultManager.ShowResult(score);
+        resultManager.ShowResult(score, "GOAL!");
     }
 
     public void GameOver()
     {
-        // ゲームオーバー：リザルト画面を流用してゲームを止める
-        resultManager.ShowResult(score);
+        resultManager.ShowResult(score, "GAME OVER");
     }
 
     void UpdateScoreUI()

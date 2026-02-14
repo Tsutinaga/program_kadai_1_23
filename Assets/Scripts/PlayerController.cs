@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
         hp = maxHp;
         gameManager = FindFirstObjectByType<GameManager>();
         hitEffect = FindFirstObjectByType<HitEffect>();
+        gameManager.UpdateHpUI(hp, maxHp);
     }
 
     void Update()
@@ -54,6 +55,8 @@ public class PlayerController : MonoBehaviour
     public void TakeDamage()
     {
         hp--;
+        gameManager.UpdateHpUI(hp, maxHp);
+
         if (hp <= 0)
             gameManager.GameOver();
     }
