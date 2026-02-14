@@ -4,9 +4,10 @@ using TMPro;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
-    [SerializeField] private TextMeshProUGUI hpText;
     private int score = 0;
     private int enemiesKilled = 0;
+    private int currentHp = 3;
+    private int maxHp = 3;
     private ResultManager resultManager;
 
     void Start()
@@ -22,9 +23,11 @@ public class GameManager : MonoBehaviour
         UpdateScoreUI();
     }
 
-    public void UpdateHpUI(int hp, int maxHp)
+    public void UpdateHpUI(int hp, int max)
     {
-        hpText.text = "HP: " + hp + " / " + maxHp;
+        currentHp = hp;
+        maxHp = max;
+        UpdateScoreUI();
     }
 
     public void ReachGoal()
@@ -39,6 +42,6 @@ public class GameManager : MonoBehaviour
 
     void UpdateScoreUI()
     {
-        scoreText.text = "Score: " + score + "\nKilled: " + enemiesKilled;
+        scoreText.text = "Score: " + score + "\nKilled: " + enemiesKilled + "\nHP: " + currentHp + " / " + maxHp;
     }
 }
