@@ -12,8 +12,12 @@ public class EnemySimpleBT : MonoBehaviour
     [SerializeField] private float playerSpeed = 2f;         // PlayerControllerのmoveSpeedと合わせる
 
     private float speed;
+    private float startDelay = 0f;
+    private float delayTimer = 0f;
     private Transform player;
     private Vector3 moveDirection; // 開始時に1回だけ計算した方向
+
+    public void SetStartDelay(float delay) { startDelay = delay; }
 
     void Start()
     {
@@ -87,6 +91,13 @@ public class EnemySimpleBT : MonoBehaviour
 
     void Update()
     {
+        // 開始ディレイ中は待機
+        if (delayTimer < startDelay)
+        {
+            delayTimer += Time.deltaTime;
+            return;
+        }
+
         switch (currentState)
         {
             case State.Chasing:
